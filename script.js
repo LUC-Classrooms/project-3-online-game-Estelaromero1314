@@ -7,10 +7,12 @@
 
 var gameState = "splash"; // Game state set to splash
 var player1; // Global variable for player
+var timer; // Timer variable
 
 function setup() {
   createCanvas(600, 400);
-  player1 = new Player(width / 2, height * 4 / 5); //  player position
+  player1 = new Player(width / 2, height * 4 / 5); // player position
+  timer = new Timer(5000); // 5 second timer
 }
 
 function draw() {
@@ -23,6 +25,9 @@ function draw() {
       break;
     case "play":
       play(); // Display play screen
+      if (timer.isFinished()) {
+        gameState = "gameOver"; //  timer and switch to game over if time is up
+      }
       break;
     case "gameOver":
       gameOver(); // Display game over screen
@@ -41,7 +46,6 @@ function splash() {
   textSize(12);
   text("(Click the mouse to continue)", width / 2, height / 2 + 30);
 }
-
 
 function play() {
   // Display play screen
@@ -78,12 +82,19 @@ function play() {
     }
   }
 
-  // Display game message
-  fill(0, 0, 200);
-  textAlign(CENTER);
+  // Display timer
+  textAlign(LEFT);
   textSize(16);
-  text("This is where the Game happens", width / 2, height / 2);
+  fill(255); // Set text color to white for better visibility
+  
+  let displayTime = (timer.elapsedTime / 1000).toFixed(1);
+  text("Elapsed time: " + displayTime + " s", 40, 100); // Show elapsed time in top left corner
+
+  if (timer.isFinished()) {
+    gameState = "gameOver"; // Check timer and switch to game over if time is up
+  }
 }
+
 
 function gameOver() {
   // Display game over screen
@@ -94,22 +105,20 @@ function gameOver() {
   text("Game Over!", width / 2, height / 2);
 }
 
-  function mousePressed() {
+function mousePressed() {
   console.log("click!");
   if (gameState == "splash") { 
     gameState = "play";  // Transition from splash to play state
+    timer.start(); // Start the timer
   } else if (gameState == "play") { 
-    gameState = "gameOver";  // Transition from play to game over state
+    // gameState = "gameOver";  // Transition from play to game over state 
   } else if (gameState == "gameOver") { 
     gameState = "splash";  // Reset to splash state
   }
 } 
 
-
-if(keyIsPressed)
-{
-  switch(keyCode)
-  {
+if(keyIsPressed) {
+  switch(keyCode) {
     case UP_ARROW:
       player1.thrust(); // accelerate
       break;
