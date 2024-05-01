@@ -11,6 +11,8 @@ var timer; // Timer variable
 var testBox; // a box to preview on the splash screen
 var dropTimer; // regulate box drops
 var presents = new Array(0); // an empty array
+var score = 0; // keep track of points 
+
 
 
 function setup() {
@@ -78,7 +80,8 @@ function play() {
     // Check for collision
     let d = dist(presents[i].x, presents[i].y, player1.x, player1.y);
     if (d < 50) {
-      presents.splice(i, 1); // If collision detected, remove the present
+      presents.splice(i, 1); 
+      score++;
       i--;
       continue; 
     }
@@ -86,35 +89,39 @@ function play() {
     if (presents[i].y > height) {
       // Present went below the canvas
       presents.splice(i, 1); // Remove from array
+      score--;
       i--; 
     }
   }
-
+  textAlign(LEFT);
+  
+  text("Score: " + score, 20, 40);
+ 
   if (timer.isFinished()) {
-    gameState = "gameOver"; // Check timer and switch to game over if time is up
-  }
+   gameState = "gameOver"; // Check timer and switch to game over if time is up
+ }
 
-
+ 
 
   if (keyIsPressed) {
     switch(keyCode) {
       case UP_ARROW:
-        player1.y -= 30; // Move up 30px
+        player1.y -= 30; // Move up 
         player1.angle = 0; // No rotation
         if (player1.y < 0) player1.y = height; // Wrap to bottom
         break;
       case DOWN_ARROW:
-        player1.y += 30; // Move down 30px
+        player1.y += 30; // Move down 
         player1.angle = PI; // Point down 
         if (player1.y > height) player1.y = 0; // Wrap to top
         break;
       case LEFT_ARROW:
-        player1.x -= 30; // Move left 30px
+        player1.x -= 30; // Move left 
         player1.angle = -HALF_PI; // Point left 
         if (player1.x < 0) player1.x = width; // Wrap to right
         break;
       case RIGHT_ARROW:
-        player1.x += 30; // Move right 30px
+        player1.x += 30; // Move right 
         player1.angle = HALF_PI; // Point right 
         if (player1.x > width) player1.x = 0; // Wrap to left
         break;
@@ -144,6 +151,8 @@ function gameOver() {
   textAlign(CENTER);
   textSize(16);
   text("Game Over!", width / 2, height / 2);
+  text("Your final score: " + score, width/2, height * 2/3);
+
 }
 
 function mousePressed() {
@@ -152,6 +161,7 @@ function mousePressed() {
     gameState = "play";  // Transition from splash to play state
     timer.start(); // Start the timer
     dropTimer.start();
+    score = 0
   } else if (gameState == "play") { 
     // gameState = "gameOver";  // Transition from play to game over 
   } else if (gameState == "gameOver") { 
