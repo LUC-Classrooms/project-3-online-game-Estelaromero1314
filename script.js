@@ -8,11 +8,17 @@
 var gameState = "splash"; // Game state set to splash
 var player1; // Global variable for player
 var timer; // Timer variable
+var testBox; // a box to preview on the splash screen
+var dropTimer; // regulate box drops
+var presents = new Array(0); // an empty array
+
 
 function setup() {
   createCanvas(600, 400);
   player1 = new Player(width / 2, height * 4 / 5); // player position
-  timer = new Timer(5000); // 5 second timer
+  timer = new Timer(30000); // 30 second timer
+  dropTimer = new Timer(1000);
+  testBox = new Box(width/2, height/3);
 }
 
 function draw() {
@@ -45,6 +51,8 @@ function splash() {
   text("Let's Play a Game!", width / 2, height / 2);
   textSize(12);
   text("(Click the mouse to continue)", width / 2, height / 2 + 30);
+  testBox.display();
+testBox.spin();
 }
 
 function play() {
@@ -54,6 +62,39 @@ function play() {
   player1.x = mouseX;
   player1.display(); // Display player
   player1.move(); // Move player
+
+  if (dropTimer.isFinished()) {
+    let p = new Box(random(width), -40); // Create a new present
+    presents.push(p); // Add to the array
+    dropTimer.start(); // Restart timer for next drop
+  }
+
+  // Manage presents
+  for (let i = 0; i < presents.length; i++) {
+    presents[i].display(); // Draw each present on the canvas
+    presents[i].move(); // Make each present drop
+    presents[i].spin(); // Make each present rotate
+
+    // Check for collision
+    let d = dist(presents[i].x, presents[i].y, player1.x, player1.y);
+    if (d < 50) {
+      presents.splice(i, 1); // If collision detected, remove the present
+      i--;
+      continue; 
+    }
+
+    if (presents[i].y > height) {
+      // Present went below the canvas
+      presents.splice(i, 1); // Remove from array
+      i--; 
+    }
+  }
+
+  if (timer.isFinished()) {
+    gameState = "gameOver"; // Check timer and switch to game over if time is up
+  }
+
+
 
   if (keyIsPressed) {
     switch(keyCode) {
@@ -85,10 +126,10 @@ function play() {
   // Display timer
   textAlign(LEFT);
   textSize(16);
-  fill(255); // Set text color to white for better visibility
+  fill(255); 
   
   let displayTime = (timer.elapsedTime / 1000).toFixed(1);
-  text("Elapsed time: " + displayTime + " s", 40, 100); // Show elapsed time in top left corner
+  text("Elapsed time: " + displayTime + " s", 40, 100); //  time in top left corner
 
   if (timer.isFinished()) {
     gameState = "gameOver"; // Check timer and switch to game over if time is up
@@ -110,8 +151,9 @@ function mousePressed() {
   if (gameState == "splash") { 
     gameState = "play";  // Transition from splash to play state
     timer.start(); // Start the timer
+    dropTimer.start();
   } else if (gameState == "play") { 
-    // gameState = "gameOver";  // Transition from play to game over state 
+    // gameState = "gameOver";  // Transition from play to game over 
   } else if (gameState == "gameOver") { 
     gameState = "splash";  // Reset to splash state
   }
